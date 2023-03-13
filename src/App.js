@@ -1,14 +1,47 @@
 import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
 
 function App() {
 
-  
+  const [stockProperty, setStockProperty] = useState({
+    symbol:"AAPL",
+    interval:"1D",
+  })
+
+  const onStockPropertyCondition = (e) =>{
+    const {name,value} = e.target
+    setStockProperty({
+      ...stockProperty,[name]:value
+    })
+  }
+
+  const getStockPriceData = () =>{
+    console.log("stock data",stockProperty)
+  }
+
   return (
     <div className="container">
       <div className='row'>
         <div className='col-md-8'>
             <h4 className='text-center'>Tradingview</h4>
+            <div className='d-flex justify-content-between'>
+              <div>
+                <input className='form-control' placeholder='AAPL' name='symbol' onChange={onStockPropertyCondition}/>
+              </div>
+              <div>
+                <select className='form-control' name='interval' onChange={onStockPropertyCondition}>
+                  <option value={"1min"}>1min</option>
+                  <option value={"5min"}>5min</option>
+                  <option value={"1D"}>1D</option>
+                  <option value={"1W"}>1W</option>
+                  <option value={"1M"}>1M</option>
+                </select>
+              </div>
+              <div>
+                <button className='btn btn-primary' onClick={getStockPriceData}>Search</button>
+              </div>
+            </div>
         </div>
         <div className='col-md-4'>
             <h4 className='text-center'>Setting</h4>
