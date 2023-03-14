@@ -4,15 +4,17 @@ import { useState,useEffect } from 'react';
 import axios from 'axios';
 import { Client } from 'ib-tws-api';
 
+
+import TradingViewChart from './components/tradingviewchart';
 function App() {
 
 
   useEffect(() => {
 
     connectToIB().then(() => {
-      console.log('finish');
+      alert('finish');
       process.exit();}).catch((e) => {
-        console.log('failure');
+        alert('failure');
         console.log(e);
         process.exit();
     });
@@ -25,7 +27,7 @@ function App() {
   const connectToIB = async() =>{
     let api = new Client({
       host: '127.0.0.1',
-      port: 4000,
+      port: 7497,
     });
   
     let time = await api.getCurrentTime();
@@ -74,6 +76,7 @@ function App() {
                 <button className='btn btn-primary' onClick={getStockPriceData}>Search</button>
               </div>
             </div>
+            <TradingViewChart/>
         </div>
         <div className='col-md-4'>
             <h4 className='text-center'>Setting</h4>
