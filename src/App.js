@@ -25,7 +25,7 @@ function App() {
   const connectToIB = async() =>{
     let api = new Client({
       host: '127.0.0.1',
-      port: 4001,
+      port: 4000,
     });
   
     let time = await api.getCurrentTime();
