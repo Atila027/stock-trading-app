@@ -6,7 +6,8 @@ module.exports = function override (config, env) {
       "tls": false,
       "net": false,
       "path":false,
-      "os":false
+      "os":false,
+      "assert": false
   }
   
   return config

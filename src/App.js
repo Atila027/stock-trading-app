@@ -1,11 +1,37 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import axios from 'axios';
-import { IBApi, EventName, ErrorCode, Contract } from "@stoqey/ib";
+import { Client } from 'ib-tws-api';
 
 function App() {
 
+
+  useEffect(() => {
+
+    connectToIB().then(() => {
+      console.log('finish');
+      process.exit();}).catch((e) => {
+        console.log('failure');
+        console.log(e);
+        process.exit();
+    });
+
+    return () => {
+      
+    }
+  }, [])
+
+  const connectToIB = async() =>{
+    let api = new Client({
+      host: '127.0.0.1',
+      port: 4001,
+    });
+  
+    let time = await api.getCurrentTime();
+    console.log('current time: ' + time);
+  }
+  
   const [stockProperty, setStockProperty] = useState({
     symbol:"AAPL",
     interval:"1D",
