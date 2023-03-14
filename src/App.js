@@ -1,6 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
+import axios from 'axios';
+import { IBApi, EventName, ErrorCode, Contract } from "@stoqey/ib";
 
 function App() {
 
@@ -17,7 +19,11 @@ function App() {
   }
 
   const getStockPriceData = () =>{
-    console.log("stock data",stockProperty)
+    console.log("stock data",stockProperty);
+    axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${stockProperty.symbol}&interval=${stockProperty.interval}&apikey=demo`).then((result)=>{
+      console.log("result", result.data)
+    })
+
   }
 
   return (
