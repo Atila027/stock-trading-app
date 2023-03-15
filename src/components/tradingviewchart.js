@@ -15,7 +15,7 @@ const TradingViewChart = (propsMarketData) => {
 
     chart.current = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
-      height: 700,
+      height: 500,
       layout: {
         backgroundColor: "#253248",
         textColor: "rgba(255, 123, 0, 0.9)"
@@ -230,7 +230,7 @@ const TradingViewChart = (propsMarketData) => {
   useEffect(() => {}, []);
 
   return (
-    <div className="App">
+    <div className="chart-channel">
       <div ref={chartContainerRef} className="chart-container" />
     </div>
   );

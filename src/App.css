@@ -40,6 +40,19 @@
   border: 2px solid;
 }
 
+.chart-channel{
+  border:2px solid #61dafb
+}
+
+p{
+  padding-top: 10px;
+  font-size: 12px;
+}
+
+.mr-10{
+  margin-right: 5px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

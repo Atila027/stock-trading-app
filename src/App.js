@@ -13,12 +13,45 @@ function App() {
     interval:"1D",
   })
 
+  const [strategySetting, setStrategySetting] = useState({
+    quantity:1000,
+    buy_only:true,
+    short_only:false,
+    volume_filter:false,
+    length_rsi:14,
+    ema_l_daily:50,
+    ema_l_weekly:50,
+    ema_l_monthly:50,
+    ob_d:50,
+    ob_w:50,
+    ob_m:50,
+    os_d:50,
+    os_w:50,
+    os_m:50,
+    rsi_tf2:'1 day',
+    rsi_tf3:'1 week',
+    rsi_tf4:'1 month',
+    rsi_exittf2:'1 day',
+    rsi_exittf3:'1 week',
+    rsi_exittf4:'1 month',
+    rsi_daily_exit_confirmation:true,
+    rsi_weekly_exit_confirmation:false,
+    rsi_monthly_exit_confirmation:false,
+    ema_exittf2:'1 day',
+    ema_exittf3:'1 week',
+    ema_exittf4:'1 month',
+    ema_daily_exit_confirmation:true,
+    ema_weekly_exit_confirmation:false,
+    ema_monthly_exit_confirmation:false,
+    rsibuy_exit_daily:50,
+    rsibuy_exit_weekly:50,
+    rsibuy_exit_monthly:50,
+    rsishort_exit_daily:50,
+    rsishort_exit_weekly:50,
+    rsishort_exit_monthly:50,
+  })
+
   const [loading, setLoading] = useState(true)
-
-  // const [stockVolumeData, setStockVolumeData] = useState([]);
-  // const [stockPriceData, setStockPriceData] = useState([]);
-  // const [stockAreaData, setStockAreaData] = useState([]);
-
   const [marketData, setMarketData] = useState(
     {
       price:[],
@@ -28,11 +61,14 @@ function App() {
   )
 
   useEffect(() => {
-      getStockPriceData();
+      // getStockPriceData();
+      if(localStorage.getItem('strategySettingStore') !== null){
+        setStrategySetting(JSON.parse(localStorage.getItem('strategySettingStore')))
+      }
   },[])
 
   useEffect(() => {
-    getStockPriceData();
+    // getStockPriceData();
   },[stockProperty])
   
   
@@ -42,6 +78,17 @@ function App() {
     setStockProperty({
       ...stockProperty,[name]:value
     })
+  }
+
+  const onStrategySettingChangeHandler = (e) =>{
+    const {name,value} = e.target
+    setStrategySetting({
+      ...strategySetting,[name]:value
+    })
+  }
+
+  const onSaveStrategyHandler = () =>{
+    localStorage.setItem("strategySettingStore",JSON.stringify(strategySetting));
   }
 
   const getStockPriceData = () =>{
@@ -93,20 +140,37 @@ function App() {
     <div className="container-fluid">
       <div className='row'>
         <div className='col-md-8 tradingview-panel'>
-            <h4 className='text-center'>Tradingview</h4>
-            <div className='d-flex justify-content-between'>
-              <div>
-                <input className='form-control' placeholder='AAPL' name='symbol' onChange={onStockPropertyCondition}/>
-              </div>
-              <div>
-                <select className='form-control' name='interval' onChange={onStockPropertyCondition}>
-                  <option value={"1D"}>1D</option>
-                  <option value={"1W"}>1W</option>
-                  <option value={"1M"}>1M</option>
+            <h2 className='text-center p-3 text-uppercase'>Bassam's Tradingview</h2>
+            <div className='row justify-content-between'>
+              <div className='col-md-4'>
+                <div className='input-group'>
+                  <span className="input-group-text">Symbol</span>
+                  <input 
+                    className='form-control' 
+                    placeholder='AAPL' 
+                    name='symbol' 
+                    onChange={onStockPropertyCondition}/>
+                </div>
+              </div>             
+              <div className='form-group col-md-4 d-flex'>
+              <span className="input-group-text">Interval</span>
+                <select 
+                  className='form-control' 
+                  name='interval' 
+                  onChange={onStockPropertyCondition}>
+                  <option defaultValue={"1D"}>1D</option>
+                  <option defaultValue={"1W"}>1W</option>
+                  <option defaultValue={"1M"}>1M</option>
                 </select>
               </div>
-              <div>
-                <button className='btn btn-primary' onClick={getStockPriceData}>Search</button>
+              <div className='col-md-4 d-flex justify-content-between'>
+                <div>
+                   <button className='btn btn-primary' onClick={getStockPriceData}>Search</button>
+                </div>
+                <div>
+                  <button className='btn btn-outline-primary mr-10'>Buy</button>
+                  <button className='btn btn-outline-warning'>Sell</button>
+                </div>
               </div>
             </div>
             <div className="w-100 mt-3">
@@ -114,9 +178,643 @@ function App() {
             </div>
         </div>
         <div className='col-md-4 setting-panel'>
-            <h4 className='text-center'>Setting</h4>
+            <h2 className='text-center text-uppercase p-3'>rsi mtf strategy</h2>
             <form>
-              <div className='form-group'></div>
+              {/* quantity */}
+              <div className="input-group">
+                <span className="input-group-text text-uppercase">quantity</span>
+                <input 
+                  type="number" 
+                  className="form-control" 
+                  name='quantity' 
+                  onChange={onStrategySettingChangeHandler}
+                  value={strategySetting.quantity}/>
+              </div>
+              {/* buy & short only */}
+              <div className='form-group'>
+                <p>BUY & SHORT ONLY</p>
+                <div className='d-flex'>
+                  <div className='form-group pr-5'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='buy-only'
+                      checked={strategySetting.buy_only}
+                      onChange={()=>setStrategySetting({
+                        ...strategySetting,buy_only:!strategySetting.buy_only
+                      })}
+                      />
+                    <label className='text-uppercase' htmlFor='buy-only' name='buy_only'>buy only</label>
+                  </div>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='short-only'
+                      checked={strategySetting.short_only}
+                      onChange={()=>setStrategySetting({
+                        ...strategySetting,short_only : !strategySetting.short_only
+                      })}
+                      />
+                    <label className='text-uppercase' htmlFor='short-only' name='short_only'>short only</label>
+                  </div>
+                </div>
+              </div>
+              {/* volum filter */}
+              <div className='form-group'>
+                <p className='text-uppercase'>indicator confirmation with volume filter</p>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='volume-filter-possible'
+                      checked={strategySetting.volume_filter}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting,volume_filter : !strategySetting.volume_filter
+                        })
+                      }}
+                      />
+                    <label className='text-uppercase ml-3' htmlFor='volume-filter-possible' name='volume_filter'>volume filter</label>
+                  </div>
+              </div>
+              {/* indicator setting */}
+              <div className='form-group'>
+                <p className='text-uppercase'>inidcator settings</p>
+                <div>
+                  <div className='d-flex'>
+                    <div className="input-group">
+                      <span className="input-group-text text-uppercase">length rsi</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='length_rsi'
+                        value={strategySetting.length_rsi} 
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">ema_l daily</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ema_l_daily' 
+                        value={strategySetting.ema_l_daily}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                  </div>
+                  <div className='d-flex'>
+                    <div className="input-group">
+                      <span className="input-group-text text-uppercase">ema_l weekly</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ema_l_weekly' 
+                        value={strategySetting.ema_l_weekly}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">ema_l monthly</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ema_l_monthly' 
+                        value={strategySetting.ema_l_monthly}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* rsi overbought settings */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi overbought settings</p>
+                <div className='d-flex'>
+                    <div className="input-group">
+                      <span class="input-group-text text-uppercase">ob-d</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ob_d' 
+                        value={strategySetting.ob_d}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">ob-w</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ob_w' 
+                        value={strategySetting.ob_w}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">ob-m</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='ob_m' 
+                        value={strategySetting.ob_m}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                </div>
+              </div>
+              {/* oversold setting */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi oversold settings</p>
+                <div className='d-flex'>
+                    <div className="input-group">
+                      <span className="input-group-text text-uppercase">os-d</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='os_d' 
+                        value={strategySetting.os_d}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">os-w</span>
+                      <input 
+                        type="number" 
+                        className="form-control"           
+                        name='os_w' 
+                        value={strategySetting.os_w}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                    <div className="input-group ml-2">
+                      <span className="input-group-text text-uppercase">os-m</span>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        name='os_m' 
+                        value={strategySetting.os_m}
+                        onChange={onStrategySettingChangeHandler}/>
+                    </div>
+                </div>
+              </div>
+              {/* rsi timeframe setting */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi timeframe settings</p>
+                <div className='d-flex'>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_TF2 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_tf2'
+                      value={strategySetting.rsi_tf2}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day' selected>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_TF3 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_tf3'
+                      value={strategySetting.rsi_tf3}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week' selected>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_TF4 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_tf4'
+                      value={strategySetting.rsi_tf4}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month' selected>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              {/* rsiexit timeframe settings */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi-exit timeframe settings</p>
+                <div className='d-flex'>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_exittf2 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_exittf2'
+                      value={strategySetting.rsi_exittf2}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day' selected>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_exittf3 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_exittf3'
+                      value={strategySetting.rsi_exittf3}
+                      onChange={onStrategySettingChangeHandler}
+                      >
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week' selected>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>RSI_exittf4</label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='rsi_exittf4'
+                      value={strategySetting.rsi_exittf4}
+                      onChange={onStrategySettingChangeHandler}
+                      >
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month' selected>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              {/* rsi-mtf exit */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi-mtf exit</p>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='rsi-daily-exit-confirmation' 
+                      name ='rsi_daily_exit_confirmation'
+                      checked={strategySetting.rsi_daily_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, rsi_daily_exit_confirmation : !strategySetting.rsi_daily_exit_confirmation
+                        })
+                      }}
+                      ></input>
+                    <label className='text-uppercase' htmlFor='rsi-daily-exit-confirmation'>rsi-daily-exit-confirmation</label>
+                  </div>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='rsi-weekly-exit-confirmation' 
+                      name ='rsi_weekly_exit_confirmation'
+                      checked={strategySetting.rsi_weekly_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, rsi_weekly_exit_confirmation : !strategySetting.rsi_weekly_exit_confirmation
+                        })
+                      }}
+                      ></input>
+                    <label className='text-uppercase' htmlFor='rsi-weekly-exit-confirmation'>rsi-weekly-exit-confirmation</label>
+                  </div>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='rsi-monthly-exit-confirmation' 
+                      name ='rsi_monthly_exit_confirmation'
+                      checked={strategySetting.rsi_monthly_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, rsi_monthly_exit_confirmation : !strategySetting.rsi_monthly_exit_confirmation
+                        })
+                      }}
+                      ></input>
+                    <label className='text-uppercase' htmlFor='rsi-monthly-exit-confirmation'>rsi-monthly-exit-confirmation</label>
+                  </div>
+              </div>
+              {/* ema exit timeframe settings */}
+              <div className='form-group'>
+                <p className='text-uppercase'>ema-exit timeframe settings</p>
+                <div className='d-flex'>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>ema_exittf2 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='ema_exittf2'
+                      value={strategySetting.ema_exittf2}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day' selected>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>ema_exittf3 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='ema_exittf3'
+                      value={strategySetting.ema_exittf3}
+                      onChange={onStrategySettingChangeHandler}>
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week' selected>1 week</option>
+                      <option defaultValue='1 month'>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                  <div className='form-group'>
+                    <label className='text-uppercase d-inline-block'>ema_exittf4 </label>
+                    <select 
+                      className='form-control-sm d-inline-block ml-2' 
+                      name='ema_exittf4'
+                      value={strategySetting.ema_exittf4}
+                      onChange={onStrategySettingChangeHandler}
+                      >
+                      <option defaultValue='1 second'>1 second</option>
+                      <option defaultValue='5 seconds'>5 seconds</option>
+                      <option defaultValue='10 seconds'>10 seconds</option>
+                      <option defaultValue='15 seconds'>15 seconds</option>
+                      <option defaultValue='30 seconds'>30 seconds</option>
+                      <option defaultValue='1 minute'>1 minute</option>
+                      <option defaultValue='3 minutes'>3 minutes</option>
+                      <option defaultValue='5 minutes'>5 minutes</option>
+                      <option defaultValue='15 minutes'>10 minutes</option>
+                      <option defaultValue='30 minutes'>30 minutes</option>
+                      <option defaultValue='45 minutes'>45 minutes</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='2 days'>2 days</option>
+                      <option defaultValue='3 days'>3 days</option>
+                      <option defaultValue='4 days'>4 days</option>
+                      <option defaultValue='1 day'>1 day</option>
+                      <option defaultValue='1 week'>1 week</option>
+                      <option defaultValue='1 month' selected>1 month</option>
+                      <option defaultValue='3 months'>3 months</option>
+                      <option defaultValue='6 months'>6 months</option>
+                      <option defaultValue='12 months'>12 months</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              {/* ema mtf exit */}
+              <div className='form-group'>
+                <p className='text-uppercase'>ema-mtf exit</p>
+                <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='ema-daily-exit-confirmation' 
+                      name ='ema_daily_exit_confirmation'
+                      checked={strategySetting.ema_daily_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, ema_daily_exit_confirmation : !strategySetting.ema_daily_exit_confirmation
+                        })
+                      }}
+                      />
+                    <label className='text-uppercase' htmlFor='ema-daily-exit-confirmation'>ema-daily-exit-confirmation</label>
+                  </div>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='ema-weekly-exit-confirmation' 
+                      name ='ema_weekly_exit_confirmation'
+                      checked={strategySetting.ema_weekly_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, ema_weekly_exit_confirmation : !strategySetting.ema_weekly_exit_confirmation
+                        })
+                      }}
+                      />
+                    <label className='text-uppercase' htmlFor='ema-weekly-exit-confirmation'>ema-weekly-exit-confirmation</label>
+                  </div>
+                  <div className='form-group'>
+                    <input 
+                      type='checkbox' 
+                      className='form-check-input' 
+                      id='ema-monthly-exit-confirmation' 
+                      name ='ema_monthly_exit_confirmation'
+                      checked={strategySetting.ema_monthly_exit_confirmation}
+                      onChange={()=>{
+                        setStrategySetting({
+                          ...strategySetting, ema_monthly_exit_confirmation : !strategySetting.ema_monthly_exit_confirmation
+                        })
+                      }}
+                      />
+                    <label className='text-uppercase' htmlFor='ema-monthly-exit-confirmation'>ema-monthly-exit-confirmation</label>
+                  </div>
+              </div>
+              {/* rsi-buy exit settings */}
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi-buy exit settings</p>
+                <div className='row'>
+                  <div className="input-group col-md-5">
+                    <span className="input-group-text text-uppercase">rsibuy_exit-daily</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsibuy_exit_daily'
+                      value={strategySetting.rsibuy_exit_daily}
+                      onChange={onStrategySettingChangeHandler}/>
+                  </div>
+                  <div className="input-group col-md-5">
+                    <span className="input-group-text text-uppercase">rsibuy_exit-weekly</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsibuy_exit_weekly'
+                      value={strategySetting.rsibuy_exit_weekly}
+                      onChange={onStrategySettingChangeHandler}
+                      />
+                  </div>
+                  <div className="input-group col-md-5">
+                    <span className="input-group-text text-uppercase">rsibuy_exit-monthly</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsibuy_exit_monthly'
+                      value={strategySetting.rsibuy_exit_monthly}
+                      onChange={onStrategySettingChangeHandler}
+                      />
+                  </div>
+                </div>
+              </div>
+              <div className='form-group'>
+                <p className='text-uppercase'>rsi-short exit settings</p>
+                <div className='row'>
+                  <div className="input-group">
+                    <span className="input-group-text text-uppercase">rsishort_exit-daily</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsishort_exit_daily'
+                      value={strategySetting.rsishort_exit_daily}
+                      onChange={onStrategySettingChangeHandler}
+                      />
+                  </div>
+                  <div className="input-group">
+                    <span className="input-group-text text-uppercase">rsishort_exit-weekly</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsishort_exit_weekly'
+                      value={strategySetting.rsishort_exit_weekly}
+                      onChange={onStrategySettingChangeHandler}
+                      />
+                  </div>
+                  <div className="input-group">
+                    <span className="input-group-text text-uppercase">rsishort_exit-monthly</span>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      name='rsishort_exit_monthly'
+                      value={strategySetting.rsishort_exit_monthly}
+                      onChange={onStrategySettingChangeHandler}
+                      />
+                  </div>
+                </div>
+              </div>
+              <div className='form-group mt-5'>
+                <div className='d-flex'>
+                  <button className='btn btn-outline-warning'>Cancel</button>
+                  <button className='btn btn-outline-primary' onClick={onSaveStrategyHandler}>Ok</button>
+                </div>
+              </div>
             </form>
         </div>
       </div>
