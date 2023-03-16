@@ -7,6 +7,44 @@ const TradingViewChart = (propsMarketData) => {
   const chart = useRef();
   const resizeObserver = useRef();
 
+
+  const calculateRSI = (data) => {
+    const timePeriod = 14;
+    let avgGain = 0;
+    let avgLoss = 0;
+  
+    // Calculate average gain and loss
+    for (let i = 1; i <= timePeriod; i++) {
+      const diff = data[i].close - data[i - 1].close;
+      if (diff > 0) {
+        avgGain += diff;
+      } else {
+        avgLoss += Math.abs(diff);
+      }
+    }
+  
+    avgGain /= timePeriod;
+    avgLoss /= timePeriod;
+  
+    // Calculate RS and RSI
+    const RS = avgGain / avgLoss;
+    const RSI = 100 - (100 / (1 + RS));
+  
+    return RSI;
+  }
+  
+  const rsiDailyCalculate = ()=>{
+
+  }
+
+  const rsiWeeklyCalculate = () =>{
+
+  }
+
+  const rsiMonthlyCalculate = () =>{
+
+  }
+
   useEffect(() => {
   
     const handleResize = () => {
@@ -143,7 +181,7 @@ const TradingViewChart = (propsMarketData) => {
       // volumeSeries.setData(propsMarketData.propsMarketData.volume);
     }
 
-    const RSI_D = chart.current.addLineSeries({
+    const RSI_D_Series = chart.current.addLineSeries({
       color: "green",
       lineStyle: 0,
       lineWidth: 1,
@@ -164,7 +202,7 @@ const TradingViewChart = (propsMarketData) => {
       })
     });
 
-    const RSI_W = chart.current.addLineSeries({
+    const RSI_W_Series = chart.current.addLineSeries({
       color: "blue",
       lineStyle: 0,
       lineWidth: 1,
@@ -185,7 +223,7 @@ const TradingViewChart = (propsMarketData) => {
       })
     });
 
-    const RSI_M = chart.current.addLineSeries({
+    const RSI_M_Series = chart.current.addLineSeries({
       color: "#f48fb1",
       lineStyle: 0,
       lineWidth: 1,

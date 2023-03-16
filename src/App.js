@@ -164,7 +164,8 @@ function App() {
                   <input 
                     className='form-control' 
                     placeholder='AAPL' 
-                    name='symbol' 
+                    name='symbol'
+                    value={stockProperty.symbol}
                     onChange={onStockPropertyCondition}/>
                 </div>
               </div>             
@@ -195,6 +196,44 @@ function App() {
               <div className='mt-5'>
                   <button className='btn btn-primary'>Automate</button>
               </div>
+              <table className='table table-info table-hover table-bordered mt-4'>
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Side</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Last Update</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
         </div>
         <div className='col-md-4 setting-panel'>
