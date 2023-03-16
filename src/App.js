@@ -14,9 +14,9 @@ function App() {
   })
 
   const ib = new (require('ib'))({
-    // clientId: 0,
-    // host: '127.0.0.1',
-    // port: 7496
+    clientId: 0,
+    host: '127.0.0.1',
+    port: 4001
   }).on('error', function (err) {
     console.error('error --- %s', err.message);
   }).on('result', function (event, args) {
