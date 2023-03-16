@@ -14,7 +14,7 @@ function App() {
   const API_KEY = '';
   const BASE_URL = 'https://api.interactivebrokers.com/v1';
   const [stockProperty, setStockProperty] = useState({
-    symbol:"RELIANCE.BSE",
+    symbol:"TSLA",
     interval:"1D",
   })
 
@@ -66,6 +66,8 @@ function App() {
   )
 
   const [orderInfo, setOrderInfo] = useState([]);
+
+  const [isAutomating, setIsAutomating] = useState(false)
 
   useEffect(() => {
       getStockPriceData();
@@ -229,7 +231,7 @@ function App() {
               {!loading && <TradingViewChart propsMarketData = {marketData}/>}
 
               <div className='mt-5'>
-                  <button className='btn btn-primary'>Automate</button>
+                  <button className='btn btn-primary' onClick={()=>setIsAutomating(!isAutomating)}>{isAutomating? "Automating..." : "Automate"}</button>
               </div>
               <table className='table table-info table-hover table-bordered mt-4'>
                 <thead>

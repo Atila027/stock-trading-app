@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { createChart, CrosshairMode } from "lightweight-charts";
 import { RSI } from 'technicalindicators';
@@ -7,8 +7,9 @@ const TradingViewChart = (propsMarketData) => {
   const chartContainerRef = useRef();
   const chart = useRef();
   const resizeObserver = useRef();
-
-
+  
+  const [orderSignal, setOrderSignal] = useState([]);
+  
   const calculateRSI = (data, timePeriod) => {
     let avgGain = 0;
     let avgLoss = 0;
@@ -32,7 +33,7 @@ const TradingViewChart = (propsMarketData) => {
   
     return RSI;
   }
-  
+
   
   useEffect(() => {
   
@@ -103,13 +104,6 @@ const TradingViewChart = (propsMarketData) => {
         color: "black",
         shape: "arrowDown",
         text: "sell",
-      },
-      {
-        time: "2019-05-31",
-        position: "belowBar",
-        color: "red",
-        shape: "arrowUp",
-        id: "id3"
       },
       {
         time: "2019-05-31",
