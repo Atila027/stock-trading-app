@@ -18,16 +18,6 @@ function App() {
     interval:"1D",
   })
 
-
-  const connectToIB = () =>{
-    const url = `${BASE_URL}/portfolio/${API_KEY}/t=1`;
-    axios.get(url).then((response)=>{
-      console.log(response);
-    }).catch((err)=>{
-      console.log(err);
-    })
-  }
-
   const [strategySetting, setStrategySetting] = useState({
     quantity:1000,
     buy_only:true,
@@ -75,17 +65,32 @@ function App() {
     }
   )
 
+  const [orderInfo, setOrderInfo] = useState([]);
+
   useEffect(() => {
       getStockPriceData();
       connectToIB();
       if(localStorage.getItem('strategySettingStore') !== null){
         setStrategySetting(JSON.parse(localStorage.getItem('strategySettingStore')))
       }
+      const orderRecord = localStorage.getItem('orderRecord');
+      console.log("orderRecordData",orderRecord)
+      if(orderRecord !== null){
+        setOrderInfo(JSON.parse(orderRecord))
+      }else{
+        setOrderInfo([]);
+      }
+      
   },[])
 
   useEffect(() => {
     // getStockPriceData();
   },[stockProperty])
+
+  useEffect(() => {
+    localStorage.setItem('orderRecord',JSON.stringify(orderInfo));
+  }, [orderInfo])
+  
   
   
 
@@ -115,7 +120,6 @@ function App() {
     let mov = [];
     let API_Call = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${stockProperty.symbol}&outputsize=full&apikey=A3QPG0GAAYX8VGI2`;
     axios.get(API_Call).then((result)=>{
-      console.log("result", result.data)
       let time = result.data["Time Series (Daily)"];
       let co = 1;
       let avr = 0;
@@ -151,7 +155,38 @@ function App() {
       setLoading(false)
     });
   }
-  
+
+  const connectToIB = () =>{
+    const url = `${BASE_URL}/portfolio/${API_KEY}/t=1`;
+    axios.get(url).then((response)=>{
+      console.log(response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  const buyStock = () =>{
+    const d = new Date();
+    setOrderInfo([...orderInfo,{
+      symbol:stockProperty.symbol,
+      side:"market",
+      type:'Buy',
+      quantity:strategySetting.quantity,
+      day:d.getHours() + " : " + d.getMinutes() + " : " + d.getSeconds() + " " + d.toLocaleDateString()
+    }])
+  }
+
+  const sellStock = () =>{
+    const d = new Date();
+    setOrderInfo([...orderInfo,{
+      symbol:stockProperty.symbol,
+      side:"market",
+      type:'Sell',
+      quantity:strategySetting.quantity,
+      day:d.getHours() + " : " + d.getMinutes() + " : " + d.getSeconds() + " " + d.toLocaleDateString()
+    }]);
+  }
+
   return (
     <div className="container-fluid">
       <div className='row'>
@@ -185,8 +220,8 @@ function App() {
                    <button className='btn btn-primary' onClick={getStockPriceData}>Search</button>
                 </div>
                 <div>
-                  <button className='btn btn-outline-primary mr-10'>Buy</button>
-                  <button className='btn btn-outline-warning'>Sell</button>
+                  <button className='btn btn-outline-primary mr-10' onClick={buyStock}>Buy</button>
+                  <button className='btn btn-outline-warning' onClick={sellStock}>Sell</button>
                 </div>
               </div>
             </div>
@@ -198,40 +233,28 @@ function App() {
               </div>
               <table className='table table-info table-hover table-bordered mt-4'>
                 <thead>
-                  <tr>
+                  <tr className='text-center'>
+                    <th>No</th>
                     <th>Symbol</th>
                     <th>Side</th>
                     <th>Type</th>
                     <th>Quantity</th>
-                    <th>Status</th>
                     <th>Last Update</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
+                <tbody className='text-center'>
+                  {orderInfo.map((item,i)=>{
+                    return (
+                      <tr>
+                        <td>{i+1}</td>
+                        <td>{item.symbol}</td>
+                        <td>{item.side}</td>
+                        <td>{item.type}</td>
+                        <td>{item.quantity}</td>
+                        <td>{item.day}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

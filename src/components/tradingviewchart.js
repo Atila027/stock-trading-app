@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { createChart, CrosshairMode } from "lightweight-charts";
+import { RSI } from 'technicalindicators';
 
 const TradingViewChart = (propsMarketData) => {
   const chartContainerRef = useRef();
@@ -32,18 +33,7 @@ const TradingViewChart = (propsMarketData) => {
     return RSI;
   }
   
-  const rsiDailyCalculate = ()=>{
-
-  }
-
-  const rsiWeeklyCalculate = () =>{
-
-  }
-
-  const rsiMonthlyCalculate = () =>{
-
-  }
-
+  
   useEffect(() => {
   
     const handleResize = () => {
