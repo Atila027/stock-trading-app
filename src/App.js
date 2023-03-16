@@ -13,6 +13,39 @@ function App() {
     interval:"1D",
   })
 
+  const ib = new (require('ib'))({
+    // clientId: 0,
+    // host: '127.0.0.1',
+    // port: 7496
+  }).on('error', function (err) {
+    console.error('error --- %s', err.message);
+  }).on('result', function (event, args) {
+    console.log('%s --- %s', event, JSON.stringify(args));
+  }).once('nextValidId', function (orderId) {
+    ib.placeOrder(
+      orderId,
+      ib.contract.stock('AAPL'),
+      ib.order.limit('BUY', 1, 0.01)  // safe, unreal value used for demo
+    );
+    ib.reqOpenOrders();
+  }).once('openOrderEnd', function () {
+    ib.disconnect();
+  })
+  
+  ib.connect()
+    .reqIds(1);
+
+  
+  let api = new Client({
+    host: '127.0.0.1',
+    port: 4001
+  });
+
+  const connectToIB = async()=>{
+    let time = await api.getCurrentTime();
+    console.log('current time: ' + time);
+  }
+
   const [strategySetting, setStrategySetting] = useState({
     quantity:1000,
     buy_only:true,
@@ -62,6 +95,7 @@ function App() {
 
   useEffect(() => {
       // getStockPriceData();
+      connectToIB();
       if(localStorage.getItem('strategySettingStore') !== null){
         setStrategySetting(JSON.parse(localStorage.getItem('strategySettingStore')))
       }
@@ -194,10 +228,10 @@ function App() {
               <div className='form-group'>
                 <p>BUY & SHORT ONLY</p>
                 <div className='d-flex'>
-                  <div className='form-group pr-5'>
+                  <div className='form-group mr-10'>
                     <input 
                       type='checkbox' 
-                      className='form-check-input' 
+                      className='form-check-input mr-10' 
                       id='buy-only'
                       checked={strategySetting.buy_only}
                       onChange={()=>setStrategySetting({
@@ -209,7 +243,7 @@ function App() {
                   <div className='form-group'>
                     <input 
                       type='checkbox' 
-                      className='form-check-input' 
+                      className='form-check-input mr-10' 
                       id='short-only'
                       checked={strategySetting.short_only}
                       onChange={()=>setStrategySetting({
@@ -226,7 +260,7 @@ function App() {
                   <div className='form-group'>
                     <input 
                       type='checkbox' 
-                      className='form-check-input' 
+                      className='form-check-input mr-10' 
                       id='volume-filter-possible'
                       checked={strategySetting.volume_filter}
                       onChange={()=>{
