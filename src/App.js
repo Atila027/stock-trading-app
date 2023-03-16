@@ -5,45 +5,27 @@ import axios from 'axios';
 import { Client } from 'ib-tws-api';
 
 import TradingViewChart from './components/tradingviewchart';
+
+
 function App() {
 
   // variable declartion
+
+  const API_KEY = '';
+  const BASE_URL = 'https://api.interactivebrokers.com/v1';
   const [stockProperty, setStockProperty] = useState({
     symbol:"RELIANCE.BSE",
     interval:"1D",
   })
 
-  const ib = new (require('ib'))({
-    clientId: 0,
-    host: '127.0.0.1',
-    port: 4001
-  }).on('error', function (err) {
-    console.error('error --- %s', err.message);
-  }).on('result', function (event, args) {
-    console.log('%s --- %s', event, JSON.stringify(args));
-  }).once('nextValidId', function (orderId) {
-    ib.placeOrder(
-      orderId,
-      ib.contract.stock('AAPL'),
-      ib.order.limit('BUY', 1, 0.01)  // safe, unreal value used for demo
-    );
-    ib.reqOpenOrders();
-  }).once('openOrderEnd', function () {
-    ib.disconnect();
-  })
-  
-  ib.connect()
-    .reqIds(1);
 
-  
-  let api = new Client({
-    host: '127.0.0.1',
-    port: 4001
-  });
-
-  const connectToIB = async()=>{
-    let time = await api.getCurrentTime();
-    console.log('current time: ' + time);
+  const connectToIB = () =>{
+    const url = `${BASE_URL}/portfolio/${API_KEY}/t=1`;
+    axios.get(url).then((response)=>{
+      console.log(response);
+    }).catch((err)=>{
+      console.log(err)
+    })
   }
 
   const [strategySetting, setStrategySetting] = useState({
@@ -95,7 +77,7 @@ function App() {
 
   useEffect(() => {
       // getStockPriceData();
-      connectToIB();
+      // connectToIB();
       if(localStorage.getItem('strategySettingStore') !== null){
         setStrategySetting(JSON.parse(localStorage.getItem('strategySettingStore')))
       }
