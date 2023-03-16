@@ -8,8 +8,7 @@ const TradingViewChart = (propsMarketData) => {
   const resizeObserver = useRef();
 
 
-  const calculateRSI = (data) => {
-    const timePeriod = 14;
+  const calculateRSI = (data, timePeriod) => {
     let avgGain = 0;
     let avgLoss = 0;
   
