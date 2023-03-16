@@ -140,7 +140,7 @@ const TradingViewChart = (propsMarketData) => {
     }else{
       candleSeries.setData(propsMarketData.propsMarketData.price);
       areaSeries.setData(propsMarketData.propsMarketData.area)
-      volumeSeries.setData(propsMarketData.propsMarketData.volume);
+      // volumeSeries.setData(propsMarketData.propsMarketData.volume);
     }
 
     const RSI_D = chart.current.addLineSeries({

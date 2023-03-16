@@ -191,6 +191,10 @@ function App() {
             </div>
             <div className="w-100 mt-3">
               {!loading && <TradingViewChart propsMarketData = {marketData}/>}
+
+              <div className='mt-5'>
+                  <button className='btn btn-primary'>Automate</button>
+              </div>
             </div>
         </div>
         <div className='col-md-4 setting-panel'>
