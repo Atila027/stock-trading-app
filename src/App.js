@@ -24,7 +24,7 @@ function App() {
     axios.get(url).then((response)=>{
       console.log(response);
     }).catch((err)=>{
-      console.log(err)
+      console.log(err);
     })
   }
 
@@ -76,8 +76,8 @@ function App() {
   )
 
   useEffect(() => {
-      // getStockPriceData();
-      // connectToIB();
+      getStockPriceData();
+      connectToIB();
       if(localStorage.getItem('strategySettingStore') !== null){
         setStrategySetting(JSON.parse(localStorage.getItem('strategySettingStore')))
       }
