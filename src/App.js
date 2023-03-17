@@ -281,7 +281,7 @@ function App() {
   }
 
   const connectToBroker = () =>{
-    axios.get('http://locahost:5000/connectToBroker').then((result)=>{
+    axios.get('http://localhost:5000/connectToBroker').then((result)=>{
       alert("Connected to Broker");
     }).catch((err)=>{
       alert("Connection failed")
