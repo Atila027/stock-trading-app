@@ -280,6 +280,14 @@ function App() {
     setLoading(false)
   }
 
+  const connectToBroker = () =>{
+    axios.get('http://locahost:5000/connectToBroker').then((result)=>{
+      alert("Connected to Broker");
+    }).catch((err)=>{
+      alert("Connection failed")
+    })
+  }
+
   const settings = {
     stockProperty, setStockProperty,
     strategySetting,setStrategySetting,
@@ -331,8 +339,9 @@ function App() {
               <div className="w-100 mt-3">
                 {!loading && <TradingViewChart propsMarketData = {marketData}/>}
 
-                <div className='mt-5'>
-                    <button className='btn btn-primary' onClick={()=>{
+                <div className='mt-5 d-flex'>
+                  <button className='btn btn-primary mr-2' onClick={connectToBroker}>Connect To Broker</button>
+                    <button className='btn btn-primary ml-2' onClick={()=>{
                       setIsAutomating(!isAutomating)
                     }
                       }>{isAutomating? "Automating..." : "Automate"}</button>
