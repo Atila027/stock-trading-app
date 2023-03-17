@@ -1,27 +1,38 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import ReactDOM from "react-dom";
 import { createChart, CrosshairMode } from "lightweight-charts";
 import { RSI } from 'technicalindicators';
+
+import { globalStore } from "../store";
 
 const TradingViewChart = (propsMarketData) => {
   const chartContainerRef = useRef();
   const chart = useRef();
   const resizeObserver = useRef();
+
+  const globalValue = useContext(globalStore);
+
+  const [isLoading, setIsLoading] = useState(false)
   
   const [orderSignal, setOrderSignal] = useState([]);
   
-  const calculateRSI = (data, timePeriod) => {
+  const calculateRSI = (data, index, timePeriod) => {
     let avgGain = 0;
     let avgLoss = 0;
   
     // Calculate average gain and loss
     for (let i = 1; i <= timePeriod; i++) {
-      const diff = data[i].close - data[i - 1].close;
-      if (diff > 0) {
-        avgGain += diff;
-      } else {
-        avgLoss += Math.abs(diff);
+      if(data[i + index].close){
+        const diff = data[i + index].close - data[i + index - 1].close;
+        if (diff > 0) {
+          avgGain += diff;
+        } else {
+          avgLoss += Math.abs(diff);
+        }
+      }else{
+        i++
       }
+      
     }
   
     avgGain /= timePeriod;
@@ -34,7 +45,42 @@ const TradingViewChart = (propsMarketData) => {
     return RSI;
   }
 
-  
+  // const strategySignal = (data) =>{
+
+
+  //   const settings = globalValue.strategySetting;
+  //   const RSI_D = calculateRSI(data,300);
+  //   const RSI_W = calculateRSI(data,7);
+  //   const RSI_M = calculateRSI(data,30);
+
+  //   const isBuy = RSI_D > settings.ob_d && RSI_W > settings.ob_w && RSI_M > settings.ob_m
+  //   const isSell = RSI_D < settings.ob_d && RSI_W < settings.ob_w && RSI_M < settings.ob_m
+
+  //   return{
+  //     buy:isBuy,
+  //     sell:isSell,
+  //   }
+  // }
+
+  useEffect(() => {
+    return () => {
+      globalValue.orderInfo.map((item,i)=>{
+        return(
+          setOrderSignal([...orderSignal,{
+            time: item.day.slice(0,10),
+            position: item.type === 'Sell'? 'aboveBar' : 'belowBar',
+            color: item.type === 'Sell'? 'yellow' : 'blue',
+            shape: item.type === 'Sell'? 'arrowDown' : 'arrowUp',
+            text: item.type
+          }])
+        )
+      });
+
+    }
+  }, [])
+
+  console.log('order signal', orderSignal)
+
   useEffect(() => {
   
     const handleResize = () => {
@@ -97,24 +143,20 @@ const TradingViewChart = (propsMarketData) => {
       })
     });
 
-    candleSeries.setMarkers([
-      {
-        time: "2019-04-09",
-        position: "aboveBar",
-        color: "black",
-        shape: "arrowDown",
-        text: "sell",
-      },
-      {
-        time: "2019-05-31",
-        position: "belowBar",
-        color: "orange",
-        shape: "arrowUp",
-        id: "id4",
-        text: "buy",
-        size: 1
-      }
-    ]);
+    // globalValue.orderInfo.map((item,i)=>{
+    //   return(
+    //     setOrderSignal([...orderSignal,{
+    //       time: item.day.slice(0,10),
+    //       position: item.type === 'Sell'? 'aboveBar' : 'belowBar',
+    //       color: item.type === 'Sell'? 'black' : 'blue',
+    //       shape: item.type === 'Sell'? 'arrowDown' : 'arrowUp',
+    //       text: item.type
+    //     }])
+    //   )
+    // });
+
+    console.log('orderSignal new',globalValue.orderSignal)
+    candleSeries.setMarkers(globalValue.orderSignal);
 
     chart.current.subscribeCrosshairMove((param) => {
       // console.log(param.hoveredMarkerId);
@@ -245,14 +287,14 @@ const TradingViewChart = (propsMarketData) => {
     setTimeout(() => {
       chart.current.timeScale().fitContent();
     }, 0);
-  },[propsMarketData.propsMarketData]);
+  },[propsMarketData.propsMarketData, globalValue]);
 
-  // Resize chart on container resizes.
-  useEffect(() => {}, []);
+
+  console.log('order signal', orderSignal);
 
   return (
     <div className="chart-channel">
-      <div ref={chartContainerRef} className="chart-container" />
+      {!isLoading && <div ref={chartContainerRef} className="chart-container" />}
     </div>
   );
 }
